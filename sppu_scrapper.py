@@ -1,6 +1,16 @@
 import os
 import requests
 from bs4 import BeautifulSoup
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+with open("cred.json", "w") as f:
+    f.write(os.environ.get("FIREBASE_TOKEN"))
+
+cred = credentials.Certificate("cred.json")
+firebase_admin.initialize_app(cred)
+
+db = firestore.client()
 
 
 def main():
@@ -16,25 +26,19 @@ def main():
         print(html.status_code)
         return
 
-    if not os.path.exists("last"):
-        open("last", "w", encoding="utf-8").close()
-
-    with open("last", "r", encoding="utf-8") as f:
-        last_result = f.read()
+    last_result = firestore_get()
 
     for i, td in enumerate(parsed_html.find_all("td")):
         if i == 1:
             latest_result = td.get_text(strip=True)
             break
 
-    with open("last", "w", encoding="utf-8") as f:
-        if last_result != latest_result:
-            print("Found new results")
-            f.write(latest_result)
-        else:
-            print("No new results are available")
-            f.write(last_result)
-            return
+    if last_result != latest_result:
+        print("Found new results")
+        firestore_add(latest_result)
+    else:
+        print("No new results are available")
+        return
 
     res = ""
     for tr in parsed_html.body.find_all("tr"):
@@ -45,6 +49,18 @@ def main():
     message = f"Found results for\n{res}\nClick here to view: https://onlineresults.unipune.ac.in/Result/Dashboard/Default"
     print(message)
     telegram(message)
+
+
+def firestore_add(course):
+    payload = {"course": course}
+    ref = db.collection("course_info").document("course").set(payload)
+    print(ref)
+
+
+def firestore_get():
+    return (
+        db.collection("course_info").document("course").get().to_dict().get("course")
+    )
 
 
 def telegram(message):
