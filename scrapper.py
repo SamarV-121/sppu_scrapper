@@ -3,6 +3,9 @@ import requests
 from bs4 import BeautifulSoup
 import firebase_admin
 from firebase_admin import credentials, firestore
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 with open("cred.json", "w") as f:
     f.write(os.environ.get("FIREBASE_TOKEN"))
