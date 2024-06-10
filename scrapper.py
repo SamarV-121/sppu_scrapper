@@ -40,13 +40,21 @@ def main():
         print("No new results are available")
         return
 
-    res = ""
+    results = [[] for _ in range(3)]
     for tr in parsed_html.body.find_all("tr"):
-        res += tr.get_text(strip=True) + "\n"
-        if last_result in res:
+        tds = tr.find_all("td")[:3]
+        for i, td in enumerate(tds):
+            results[i].append(td.get_text(strip=True))
+
+        if last_result in results[1]:
             break
 
-    message = f"Found results for\n{res}\nClick here to view: https://onlineresults.unipune.ac.in/Result/Dashboard/Default"
+    res_ids, res_courses, res_dates = results
+    joined_result = ""
+    for i, res_id in enumerate(res_ids):
+        joined_result += f"{res_id}. {res_courses[i]}\nResult date: {res_dates[i]}\n"
+
+    message = f"Found results for\n{joined_result}\nClick here to view: https://onlineresults.unipune.ac.in/Result/Dashboard/Default"
     print(message)
     telegram(message)
 
