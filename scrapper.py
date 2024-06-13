@@ -78,7 +78,7 @@ def firestore_get():
 
 def telegram(message):
     api = f"https://api.telegram.org/bot{os.environ.get('TELEGRAM_TOKEN')}"
-    chat_id = "-1001893841304"
+    chat_id = "-1002176229957"
     payload = {"chat_id": chat_id, "text": message}
 
     result = requests.post(api + "/sendMessage", data=payload, timeout=5)
