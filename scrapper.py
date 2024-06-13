@@ -55,6 +55,8 @@ def main():
     res_ids, res_courses, res_dates = results
     joined_result = ""
     for i, res_id in enumerate(res_ids):
+        if i == len(res_ids) - 1:
+            break
         joined_result += f"{res_id}. {res_courses[i]}\nResult date: {res_dates[i]}\n"
 
     message = f"Found results for\n{joined_result}\nClick here to view: https://onlineresults.unipune.ac.in/Result/Dashboard/Default"
