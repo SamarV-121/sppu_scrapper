@@ -17,11 +17,15 @@ db = firestore.client()
 
 
 def main():
-    html = requests.get(
-        "https://onlineresults.unipune.ac.in/Result/Dashboard/Default",
-        verify=False,
-        timeout=10,
-    )
+    try:
+        html = requests.get(
+            "https://onlineresults.unipune.ac.in/Result/Dashboard/Default",
+            verify=False,
+            timeout=10,
+        )
+    except Exception as e:
+        print("An unexpected error occurred:", e)
+        return
 
     if html.status_code == 200:
         parsed_html = BeautifulSoup(html.content, features="lxml")
@@ -71,9 +75,7 @@ def firestore_add(course):
 
 
 def firestore_get():
-    return (
-        db.collection("course_info").document("course").get().to_dict().get("course")
-    )
+    return db.collection("course_info").document("course").get().to_dict().get("course")
 
 
 def telegram(message):
